@@ -1,7 +1,7 @@
 
 
 function Get-AccountNames{
-    $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount | Select Name
+    $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount | Select -ExpandProperty Name
     #$ListOfNames = $ListOfAccountNames.Name
     return $ListOfAccountNames
 }
