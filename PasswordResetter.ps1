@@ -10,6 +10,8 @@ $TargetAccountName = Get-AccountNames
 
 echo $TargetAccountName
 
+
+
 #$SecurePassword = Read-Host -AsSecureString  "Enter password" | ConvertFrom-SecureString | out-file C:\Users\shinhs\Documents\securePassword.txt
 
 #$PlainPassword = Get-Content C:\Users\shinhs\Documents\securePassword.txt
