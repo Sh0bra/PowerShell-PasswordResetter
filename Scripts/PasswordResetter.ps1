@@ -2,11 +2,49 @@
 
 .\loadDialog.ps1 -XamlPath '..\Forms\PasswordResetterGUI.xaml'
 
+#######################################################################
+
+
+function Get-AccountNames {
+    $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount -Filter "Disabled = False" | Select -ExpandProperty Name
+    #$ListOfNames = $ListOfAccountNames.Name
+    return $ListOfAccountNames
+}
+
+
+function Populate-ComboBox {
+    $ListOfAccounts = Get-AccountNames
+
+    ForEach ($Account in $ListOfAccounts) {
+        $cbxSelectUser.Items.Add($Account) | out-null
+    }   
+    $cbxSelectUser.SelectedIndex = 0; 
+}
+
+
+function Initialize-PasswordBoxes {
+    $pwbOldPassword.PasswordChar = '*'  
+    $pwbNewPassword.PasswordChar = '*' 
+    $pwbConfirmNewPassword.PasswordChar = '*'
+}
+
+
+#DO STUFF
+
+Populate-ComboBox
+#Initialize-PasswordBoxes
+
 
 #EVENT Handler 
-    $btnChangePassword.add_Click({  
-       $lblOldPassword.Content = "Hello World"
-    })
+    
+$btnChangePassword.add_Click({  
+    $Target = $cbxSelectUser.SelectedItem.ToString()
+    $lblNewPassword.Content = $Target
+    $Password = $pwbNewPassword.Password.ToString()
+
+    $lblOldPassword.Content = $Password
+})
+
 
 
 
@@ -16,12 +54,11 @@ $xamGUI.ShowDialog() | out-null
 
 <#
 
+#######################################################################
 
-function Get-AccountNames{
-    $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount -Filter "Disabled = False" | Select -ExpandProperty Name
-    #$ListOfNames = $ListOfAccountNames.Name
-    return $ListOfAccountNames
-}
+PS C:\> $Password = Read-Host -AsSecureString
+PS C:\> $UserAccount = Get-LocalUser -Name "User02"
+PS C:\> $UserAccount | Set-LocalUser -Password $Password
 
 function Validate-Account($Target, $ListOfAccounts){
     echo "out loop"
@@ -48,7 +85,7 @@ function Validate-Account($Target, $ListOfAccounts){
 
 #clear
 
-$ListOfAccounts = Get-AccountNames
+
 
 echo $ListOfAccounts
 #$Target = Read-Host -Prompt "Enter User Name"
