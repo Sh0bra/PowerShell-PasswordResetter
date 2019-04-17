@@ -7,7 +7,6 @@
 
 function Get-AccountNames {
     $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount -Filter "Disabled = False" | Select -ExpandProperty Name
-    #$ListOfNames = $ListOfAccountNames.Name
     return $ListOfAccountNames
 }
 
@@ -39,10 +38,11 @@ Populate-ComboBox
     
 $btnChangePassword.add_Click({  
     $Target = $cbxSelectUser.SelectedItem.ToString()
-    $lblNewPassword.Content = $Target
     $Password = $pwbNewPassword.Password.ToString()
-
-    $lblOldPassword.Content = $Password
+    $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
+    $TargetAccount = Get-LocalUser -Name $Target
+    $TargetAccount | Set-LocalUser -Password $SecurePassword
+    $lblOldPassword.Content = $SecurePassword
 })
 
 
