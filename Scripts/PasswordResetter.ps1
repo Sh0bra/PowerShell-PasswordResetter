@@ -17,13 +17,19 @@ function Populate-ComboBox {
     ForEach ($Account in $ListOfAccounts) {
         $cbxLocalAccount.Items.Add($Account) | out-null
     }   
-    $cbxLocalAccount.SelectedIndex = 0; 
+    $cbxLocalAccount.SelectedIndex = -1
 }
 
 
 function Initialize-PasswordBoxes {
     $pwbLocalNewPassword.PasswordChar = '*' 
     $pwbLocalReEnterNewPassword.PasswordChar = '*'
+}
+
+function Reset-LocalState {
+    $pwbLocalNewPassword.Password = ''
+    $pwbLocalReEnterNewPassword.Password = ''
+    $cbxLocalAccount.SelectedIndex = -1
 }
 
 
@@ -47,12 +53,13 @@ $btnLocalChangePassword.add_Click({
         
         $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
         $TargetAccount = Get-LocalUser -Name $Target
-        $TargetAccount | Set-LocalUser -Password $SecurePassword
+        $TargetAccount | Set-LocalUser -Password $SecurePassword 
         [System.Windows.MessageBox]::Show('Password has been changed')
     } catch {
-        Write-Host "Error"
-        echo $_ 
+        [System.Windows.MessageBox]::Show('Password Error: Passwords do not match.')
     }
+
+    Reset-LocalState
 })
 
 
