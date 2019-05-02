@@ -3,7 +3,8 @@
 .\loadDialog.ps1 -XamlPath '..\Forms\PasswordResetterGUIv2.xaml'
 
 #######################################################################
-
+###############             Functions                  ################
+#######################################################################
 
 function Get-AccountNames {
     $ListOfAccountNames = Get-WmiObject -Class Win32_UserAccount -Filter "Disabled = False" | Select -ExpandProperty Name
@@ -32,15 +33,18 @@ function Reset-LocalState {
     $cbxLocalAccount.SelectedIndex = -1
 }
 
+###############################################################################
+###############                  DO STUFF                      ################
+###############################################################################
 
-#DO STUFF
 
 Populate-ComboBox
 Initialize-PasswordBoxes
 
+###############################################################################
+###############               EVENT Handler                    ################
+###############################################################################
 
-#EVENT Handler 
-    
 $btnLocalChangePassword.add_Click({  
     try {
         $Target = $cbxLocalAccount.SelectedItem.ToString()
@@ -63,11 +67,51 @@ $btnLocalChangePassword.add_Click({
 })
 
 
+$btnSchedularScheduleTask.add_Click({  
+    try {
+        $Target = $txbSchedularAccount.Text
+
+        if ($cbxSchedularLocalAdmin.IsChecked -eq $true) { $Target = "Administrator" }
+
+        [System.Windows.MessageBox]::Show($Target)
+        $Password = $pwbSchedularNewPassword.Password.ToString()
+
+        if (!$Password) { throw 'Invalid Password' }
+
+        if (!($Password -eq $pwbSchedularReEnterNewPassword.Password.ToString())) {
+            throw 'Password Does not Match'
+        }
+        
+        $SecurePassword = ConvertTo-SecureString $Password -AsPlainText -Force
+        $TargetAccount = Get-LocalUser -Name $Target
+        #$TargetAccount | Set-LocalUser -Password $SecurePassword 
+        [System.Windows.MessageBox]::Show('Password has been changed')
+    } catch {
+        [System.Windows.MessageBox]::Show('Password Error: Passwords do not match.')
+    }
+
+})
+
+$btnSchedularViewTasks.add_Click({  
+    try {
+        [System.Windows.MessageBox]::Show('Open New Window Showing Tasks in Task Manager \n that are relevent to this program.')       
+    } catch {
+        [System.Windows.MessageBox]::Show('Password Error: Passwords do not match.')
+    }
+})
 
 
-#Launch the window
+###############################################################################
+###############             Launch the window                  ################
+###############################################################################
+
 $xamGUI.ShowDialog() | out-null
 
 
 
 #stop-process -Id $PID
+
+
+# $range=10..21 | %{"10.10.0.$_"}
+# foreach ($ip in $range){
+# ([System.Net.Dns]::GetHostByAddress($ip)).HostName}
